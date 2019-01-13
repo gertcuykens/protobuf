@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package main;
+
+message Task {
+    string text = 1;
+    bool done = 2;
+}
+
+message Test {
+    google.protobuf.Any object = 1;
+}
