@@ -4,6 +4,8 @@ import "google/protobuf/any.proto";
 
 package main;
 
+// option go_package = "github.com/gertcuykens/protobuf";
+
 message Task {
     string text = 1;
     bool done = 2;

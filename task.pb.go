@@ -5,8 +5,8 @@ package main
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
+	proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
 )
@@ -20,7 +20,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Task struct {
 	Text                 string   `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
@@ -132,7 +132,7 @@ func init() {
 func init() { proto.RegisterFile("task.proto", fileDescriptor_ce5d8dd45b4a91ff) }
 
 var fileDescriptor_ce5d8dd45b4a91ff = []byte{
-	// 156 bytes of a gzipped FileDescriptorProto
+	// 161 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x49, 0x2c, 0xce,
 	0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0xc9, 0x4d, 0xcc, 0xcc, 0x93, 0x92, 0x4c, 0xcf,
 	0xcf, 0x4f, 0xcf, 0x49, 0xd5, 0x07, 0x8b, 0x25, 0x95, 0xa6, 0xe9, 0x27, 0xe6, 0x55, 0x42, 0x14,
@@ -140,9 +140,10 @@ var fileDescriptor_ce5d8dd45b4a91ff = []byte{
 	0x48, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0x81, 0xd9, 0x20, 0xb1, 0x94, 0xfc, 0xbc, 0x54, 0x09,
 	0x26, 0x05, 0x46, 0x0d, 0x8e, 0x20, 0x30, 0x5b, 0xc9, 0x84, 0x8b, 0x25, 0x24, 0xb5, 0xb8, 0x44,
 	0x48, 0x87, 0x8b, 0x2d, 0x3f, 0x29, 0x2b, 0x35, 0x19, 0xa2, 0x83, 0xdb, 0x48, 0x44, 0x0f, 0x62,
-	0x87, 0x1e, 0xcc, 0x0e, 0x3d, 0xc7, 0xbc, 0xca, 0x20, 0xa8, 0x1a, 0x27, 0x9e, 0x13, 0x8f, 0xe4,
-	0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x31, 0x89, 0x0d, 0xac, 0xc6, 0x18, 0x10,
-	0x00, 0x00, 0xff, 0xff, 0xa7, 0xdb, 0x79, 0x50, 0xa9, 0x00, 0x00, 0x00,
+	0x87, 0x1e, 0xcc, 0x0e, 0x3d, 0xc7, 0xbc, 0xca, 0x20, 0xa8, 0x1a, 0x27, 0x81, 0x13, 0x8f, 0xe4,
+	0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc6, 0x63, 0x39, 0x86, 0x24, 0x36,
+	0xb0, 0x3a, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdb, 0xbb, 0x59, 0x99, 0xad, 0x00, 0x00,
+	0x00,
 }
 
 func (m *Task) Marshal() (dAtA []byte, err error) {
@@ -201,9 +202,9 @@ func (m *Test) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTask(dAtA, i, uint64(m.Object.Size()))
-		n1, err := m.Object.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		n1, err1 := m.Object.MarshalTo(dAtA[i:])
+		if err1 != nil {
+			return 0, err1
 		}
 		i += n1
 	}
@@ -285,7 +286,7 @@ func (m *Task) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -313,7 +314,7 @@ func (m *Task) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -323,6 +324,9 @@ func (m *Task) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTask
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTask
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -342,7 +346,7 @@ func (m *Task) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -355,6 +359,9 @@ func (m *Task) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTask
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTask
 			}
 			if (iNdEx + skippy) > l {
@@ -385,7 +392,7 @@ func (m *Test) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -413,7 +420,7 @@ func (m *Test) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -422,6 +429,9 @@ func (m *Test) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTask
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTask
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -439,6 +449,9 @@ func (m *Test) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTask
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTask
 			}
 			if (iNdEx + skippy) > l {
@@ -508,8 +521,11 @@ func skipTask(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthTask
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthTask
 			}
 			return iNdEx, nil
@@ -540,6 +556,9 @@ func skipTask(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthTask
+				}
 			}
 			return iNdEx, nil
 		case 4:
