@@ -1,3 +1,5 @@
+// npm i protobufjs --save
+
 const bench = (f, t) => {
   const a = new Date;
   for (let i = 0; i < 1000000; i++) {

@@ -25,7 +25,6 @@ hexdump -c task.pbf
 hexdump task.pbf
 
 # npm i protobufjs -g
-# npm i protobufjs --save
 
 pbjs -p . task.proto -t static-module -w commonjs -o task.pb.js
 
