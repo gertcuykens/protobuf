@@ -4,12 +4,17 @@ import (
 	"encoding/json"
 	testing "testing"
 
+	"github.com/gertcuykens/protobuf/task"
 	proto2 "github.com/gogo/protobuf/proto"
 	"github.com/golang/protobuf/proto"
 )
 
+// const UINT64 = uint64(unsafe.Sizeof(uint64(0)))
+
+//go:generate bash -c ./proto.sh
+
 func BenchmarkMarshalJson(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -23,7 +28,7 @@ func BenchmarkMarshalJson(b *testing.B) {
 }
 
 func BenchmarkUnMarshalJson(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -34,7 +39,7 @@ func BenchmarkUnMarshalJson(b *testing.B) {
 		return
 	}
 
-	var task Task
+	var task task.Task
 	for n := 0; n < b.N; n++ {
 		err := json.Unmarshal(bin, &task)
 		if err != nil {
@@ -45,7 +50,7 @@ func BenchmarkUnMarshalJson(b *testing.B) {
 }
 
 func BenchmarkMarshalProto(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -59,7 +64,7 @@ func BenchmarkMarshalProto(b *testing.B) {
 }
 
 func BenchmarkUnMarshalProto(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -70,9 +75,9 @@ func BenchmarkUnMarshalProto(b *testing.B) {
 		return
 	}
 
-	var task Task
+	var t task.Task
 	for n := 0; n < b.N; n++ {
-		err := proto.Unmarshal(bin, &task)
+		err := proto.Unmarshal(bin, &t)
 		if err != nil {
 			b.Error(err)
 			return
@@ -81,7 +86,7 @@ func BenchmarkUnMarshalProto(b *testing.B) {
 }
 
 func BenchmarkMarshalProto2(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -95,7 +100,7 @@ func BenchmarkMarshalProto2(b *testing.B) {
 }
 
 func BenchmarkUnMarshalProto2(b *testing.B) {
-	msg := &Task{
+	msg := &task.Task{
 		Text: "test",
 		Done: false,
 	}
@@ -106,9 +111,9 @@ func BenchmarkUnMarshalProto2(b *testing.B) {
 		return
 	}
 
-	var task Task
+	var t task.Task
 	for n := 0; n < b.N; n++ {
-		err := proto2.Unmarshal(bin, &task)
+		err := proto2.Unmarshal(bin, &t)
 		if err != nil {
 			b.Error(err)
 			return

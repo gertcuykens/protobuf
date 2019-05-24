@@ -2,9 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/any.proto";
 
-package main;
+package task;
 
-// option go_package = "github.com/gertcuykens/protobuf";
+// option go_package = "github.com/gertcuykens/protobuf/task";
 
 message Task {
     string text = 1;

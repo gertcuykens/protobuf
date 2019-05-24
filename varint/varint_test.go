@@ -1,4 +1,4 @@
-package main
+package varint
 
 import (
 	"encoding/binary"

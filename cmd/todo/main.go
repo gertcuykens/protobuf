@@ -10,12 +10,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gertcuykens/protobuf/task"
 	"github.com/golang/protobuf/proto"
 )
 
-// const UINT64 = uint64(unsafe.Sizeof(uint64(0)))
-
-//go:generate bash -c ./proto.sh
 func main() {
 	flag.Parse()
 	if flag.NArg() < 1 {
@@ -38,12 +36,12 @@ func main() {
 }
 
 func add(text string) error {
-	task := &Task{
+	t := &task.Task{
 		Text: text,
 		Done: false,
 	}
 
-	b, err := proto.Marshal(task)
+	b, err := proto.Marshal(t)
 	if err != nil {
 		return fmt.Errorf("marshal task %v", err)
 	}
@@ -88,7 +86,7 @@ func stream(buffer io.ByteReader) error {
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("%v ----", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	if l == 0 {
@@ -104,23 +102,23 @@ func stream(buffer io.ByteReader) error {
 		}
 	}
 
-	if err := task(b); err != nil {
+	if err := todo(b); err != nil {
 		return fmt.Errorf("%v", err)
 	}
 
 	return stream(buffer)
 }
 
-func task(b []byte) error {
-	var task Task
-	if err := proto.Unmarshal(b, &task); err != nil {
+func todo(b []byte) error {
+	var t task.Task
+	if err := proto.Unmarshal(b, &t); err != nil {
 		return fmt.Errorf("read task %v", err)
 	}
-	if task.Done {
+	if t.Done {
 		fmt.Printf("👍")
 	} else {
 		fmt.Printf("😱")
 	}
-	fmt.Printf(" %s\n", task.Text)
+	fmt.Printf(" %s\n", t.Text)
 	return nil
 }

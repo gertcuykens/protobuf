@@ -2,7 +2,7 @@
   "name": "protobuf",
   "version": "0.0.0",
   "description": "",
-  "main": "main_test.js",
+  "main": "task/task_test.js",
   "browser": "task.js",
   "dependencies": {
     "protobufjs": "^6.8.8"

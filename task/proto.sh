@@ -18,8 +18,8 @@ Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types:.
 # protoc task.proto -I . --go_out=plugins=grpc,paths=source_relative:.
 
 protoc -I . task.proto --descriptor_set_out=task.protoset --include_imports
-protoc -I . task.proto --encode main.Task <<< 'text: "test", done: true' > task.pbf
-protoc -I . task.proto --decode main.Task < task.pbf
+protoc -I . task.proto --encode task.Task <<< 'text: "test", done: true' > task.pbf
+protoc -I . task.proto --decode task.Task < task.pbf
 protoc --decode_raw < task.pbf
 hexdump -c task.pbf
 hexdump task.pbf
@@ -27,7 +27,8 @@ hexdump task.pbf
 # npm i protobufjs -g
 # npm i protobufjs --save
 
-# pbjs -p . task.proto -t static-module -w commonjs -o task.pb.js
+pbjs -p . task.proto -t static-module -w commonjs -o task.pb.js
+
 # pbjs -p . task.proto -t static-module --es6 -w es6 -o task.pb.js
 
 # npm i browserify -g
