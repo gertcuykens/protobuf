@@ -1,4 +1,7 @@
+node_modules
+protobuf
 *.exe
 *.gz
 *.pbf
-./protobuf
+*.protoset
+*.pb.*

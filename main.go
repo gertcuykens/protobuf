@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -9,15 +9,11 @@ import (
 	"log"
 	"os"
 	"strings"
-	"unsafe"
 
-	// "github.com/golang/protobuf/proto"
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
-const UINT64 = uint64(unsafe.Sizeof(uint64(0)))
-
-var UINT64B = make([]byte, UINT64)
+// const UINT64 = uint64(unsafe.Sizeof(uint64(0)))
 
 //go:generate bash -c ./proto.sh
 func main() {
@@ -49,67 +45,76 @@ func add(text string) error {
 
 	b, err := proto.Marshal(task)
 	if err != nil {
-		return fmt.Errorf("could not encode task: %v", err)
+		return fmt.Errorf("marshal task %v", err)
 	}
 
-	f, err := os.OpenFile("data.pbf", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("tasks.pbf", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		return fmt.Errorf("could not open %s", err)
+		return fmt.Errorf("open file %s", err)
 	}
 
-	if err := binary.Write(f, binary.LittleEndian, uint64(len(b))); err != nil {
-		return fmt.Errorf("could not encode length of message: %s", err)
+	buf := make([]byte, binary.MaxVarintLen64)
+	n := binary.PutUvarint(buf, uint64(len(b)))
+
+	for i := 0; i < n; i++ {
+		if err := binary.Write(f, binary.BigEndian, buf[i]); err != nil {
+			return fmt.Errorf("write varint %s", err)
+		}
 	}
 
 	_, err = f.Write(b)
 	if err != nil {
-		return fmt.Errorf("could not write task to file: %s", err)
+		return fmt.Errorf("write task %s", err)
 	}
 
 	if err := f.Close(); err != nil {
-		return fmt.Errorf("could not close file %s", err)
+		return fmt.Errorf("close file %s", err)
 	}
 	return nil
 }
 
 func list() error {
-	file, err := os.Open("data.pbf")
+	file, err := os.Open("tasks.pbf")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-	return chunck(file, 0)
+	return stream(bufio.NewReader(file))
 }
 
-func chunck(file *os.File, off uint64) error {
-	var l uint64
-	n, err := file.ReadAt(UINT64B, int64(off))
-	if n > 0 {
-		if err := binary.Read(bytes.NewReader(UINT64B), binary.LittleEndian, &l); err != nil {
-			return fmt.Errorf("could not decode message length: %v", err)
-		}
-		fmt.Println("-----", off, "->", off+UINT64+l, "-----")
-		b := make([]byte, l)
-		if n, err := file.ReadAt(b, int64(off+UINT64)); err != nil {
-			return fmt.Errorf("could not decode message body: %v, %d", err, n)
-		}
-		if err := task(b); err != nil {
-			return fmt.Errorf("could not decode message body: %v", err)
-		}
-	}
+func stream(buffer io.ByteReader) error {
+	l, err := binary.ReadUvarint(buffer)
 	if err == io.EOF {
 		return nil
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("%v ----", err)
 	}
-	return chunck(file, uint64(off)+UINT64+l)
+
+	if l == 0 {
+		return nil
+	}
+
+	b := make([]byte, l)
+
+	for i := range b {
+		b[i], err = buffer.ReadByte()
+		if err != nil {
+			return fmt.Errorf("%v", err)
+		}
+	}
+
+	if err := task(b); err != nil {
+		return fmt.Errorf("%v", err)
+	}
+
+	return stream(buffer)
 }
 
 func task(b []byte) error {
 	var task Task
 	if err := proto.Unmarshal(b, &task); err != nil {
-		return fmt.Errorf("could not read task: %v", err)
+		return fmt.Errorf("read task %v", err)
 	}
 	if task.Done {
 		fmt.Printf("👍")

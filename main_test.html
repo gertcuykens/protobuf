@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Task</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.6/dist/protobuf.min.js"></script>
+    <script type="module">
+      // import {html, render} from 'https://unpkg.com/lit-html'
+
+      const bench = (f, t) => {
+        const a = new Date;
+        for (let i = 0; i < 1000; i++) { // 1000000
+          if (t) {
+            if (JSON.stringify(f()) != JSON.stringify(t)) return {'f':f(), 't':t}
+          } else {
+            f()
+          }
+        }
+        const b = new Date
+        return (b - a)
+      }
+
+      console.log('stringify parse', bench(() => {
+        const msg = {text: 'test', done: false}
+        const bin = JSON.stringify(msg)
+        return JSON.parse(bin)
+      }, {text: 'test', done: false}))
+
+      console.log('json response', bench(async () => {
+        let result
+        await fetch('./task.json')
+          .then(response => response.json())
+          .then(data => result = data)
+        return result
+      }, null))
+
+      protobuf.load('./task.proto').then((root) => {
+        const Task = root.lookup('Task');
+
+        console.log('encode decode', bench(async () => {
+          const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
+          Task.encode({text: 'test', done: false}, writer)
+          const buffer = writer.finish()
+          const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+          return Task.decode(reader)
+        }, null))
+
+        console.log('encodeDelimited decodeDelimited', bench(async () => {
+          const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
+          Task.encodeDelimited({text: 'test', done: false}, writer)
+          const buffer = writer.finish()
+          const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+          return Task.decodeDelimited(reader)
+        }, null))
+
+        console.log('decode', bench(async () => {
+          let result
+          await fetch('./task.pbf')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+              const buffer = new Uint8Array(data)
+              const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+              result = Task.decode(reader)
+            })
+          return result
+        }, null))
+
+        console.log('decodeDelimited', bench(async () => {
+          let result
+          await fetch('./tasks.pbf')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+              const buffer = new Uint8Array(data)
+              const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+              while (reader.pos < reader.len) {
+                result += Task.decodeDelimited(reader)
+              }
+            })
+          return result
+        }, null))
+
+      })
+    </script>
+  </head>
+</html>
