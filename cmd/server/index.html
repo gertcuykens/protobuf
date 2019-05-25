@@ -13,106 +13,124 @@
     </style>
     <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.6/dist/protobuf.min.js"></script>
     <script type="module">
-      // import {html, render} from 'https://unpkg.com/lit-html'
+      import Test from './test.js'
 
-      const bench = (f, t) => {
-        const a = new Date;
-        for (let i = 0; i < 500; i++) { // 1000000
-          if (t) {
-            const r = f()
-            if (JSON.stringify(r) != JSON.stringify(t)) return {'f':r, 't':t}
-          } else {
-            f()
-          }
-        }
-        const b = new Date
-        return (b - a)
-      }
+      (() => {
+        const t = new Test(async () => {
+          let result
+          await fetch('json', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: 'test', done: true})})
+            .then(response => response.json())
+            .then(data => result = data)
+          return result
+        }, 'server json')
+        t.bench(1000)
+        t.test({text: 'test', done: true})
+      })();
 
-      console.log('server json', bench(async () => {
-        let result
-        await fetch('json', {
-          method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({text: 'test', done: true})})
-          .then(response => response.json())
-          .then(data => result = data)
-        return result
-      }, null)) // {text: 'test', done: true}
+      (() => {
+        const t = new Test(async () => {
+          const msg = {text: 'test', done: true}
+          const bin = JSON.stringify(msg)
+          return JSON.parse(bin)
+        }, 'stringify parse')
+        t.bench(100000)
+        t.test({text: 'test', done: true})
+      })();
 
-      console.log('stringify parse', bench(() => {
-        const msg = {text: 'test', done: false}
-        const bin = JSON.stringify(msg)
-        return JSON.parse(bin)
-      }, {text: 'test', done: false}))
-
-      console.log('json response', bench(async () => {
-        let result
-        await fetch('./task.json')
-          .then(response => response.json())
-          .then(data => result = data)
-        return result
-      }, null))
+      (() => {
+        const t = new Test(async () => {
+          let result
+          await fetch('./task.json')
+            .then(response => response.json())
+            .then(data => result = data)
+          return result
+        }, 'json response')
+        t.bench(1000)
+        t.test({text: 'test', done: false})
+      })();
 
       protobuf.load('./task.proto').then((root) => {
         const Task = root.lookup('Task');
 
-        console.log('server pbf', bench(async () => {
-          let result
-          await fetch('pbf', {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/octet-stream'},
-            body: new Uint8Array([0x0a, 0x04, 0x74, 0x65, 0x73, 0x74, 0x10, 0x01])})
-            .then(response => response.arrayBuffer())
-            .then(data => {
-              const buffer = new Uint8Array(data)
-              const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-              result = Task.decode(reader)
-            })
-          return result
-        }, null)) // {text: 'test', done: false}
+        (() => {
+          const t = new Test(async () => {
+            let result
+            await fetch('pbf', {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/octet-stream'},
+              body: new Uint8Array([0x0a, 0x04, 0x74, 0x65, 0x73, 0x74, 0x10, 0x01])})
+              .then(response => response.arrayBuffer())
+              .then(data => {
+                const buffer = new Uint8Array(data)
+                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+                result = Task.decode(reader)
+              })
+            return result
+          }, 'server pbf')
+          t.bench(1000)
+          t.test({text: 'test', done: true})
+        })();
 
-        console.log('encode decode', bench(async () => {
-          const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
-          Task.encode({text: 'test', done: false}, writer)
-          const buffer = writer.finish()
-          const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-          return Task.decode(reader)
-        }, null))
+        (() => {
+          const t = new Test(async () => {
+            const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
+            Task.encode({text: 'test', done: false}, writer)
+            const buffer = writer.finish()
+            const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+            return Task.decode(reader)
+          }, 'encode decode')
+          t.bench(1000)
+          t.test({text: 'test', done: false})
+        })();
 
-        console.log('encodeDelimited decodeDelimited', bench(async () => {
-          const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
-          Task.encodeDelimited({text: 'test', done: false}, writer)
-          const buffer = writer.finish()
-          const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-          return Task.decodeDelimited(reader)
-        }, null))
+        (() => {
+          const t = new Test(async () => {
+            const writer = protobuf.Writer.create() // new protobuf.BufferWriter()
+            Task.encodeDelimited({text: 'test', done: false}, writer)
+            const buffer = writer.finish()
+            const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+            return Task.decodeDelimited(reader)
+          }, 'encodeDelimited decodeDelimited')
+          t.bench(1000)
+          t.test({text: 'test', done: false})
+        })();
 
-        console.log('decode', bench(async () => {
-          let result
-          await fetch('./task.pbf')
-            .then(response => response.arrayBuffer())
-            .then(data => {
-              const buffer = new Uint8Array(data)
-              const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-              result = Task.decode(reader)
-            })
-          return result
-        }, null))
+        (() => {
+          const t = new Test(async () => {
+            let result
+            await fetch('./task.pbf')
+              .then(response => response.arrayBuffer())
+              .then(data => {
+                const buffer = new Uint8Array(data)
+                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+                result = Task.decode(reader)
+              })
+            return result
+          }, 'decode')
+          t.bench(1)
+          t.test({text: 'test', done: true})
+        })();
 
-        console.log('decodeDelimited', bench(async () => {
-          let result
-          await fetch('./tasks.pbf')
-            .then(response => response.arrayBuffer())
-            .then(data => {
-              const buffer = new Uint8Array(data)
-              const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-              while (reader.pos < reader.len) {
-                result += Task.decodeDelimited(reader)
-              }
-            })
-          return result
-        }, null))
+        (() => {
+          const t = new Test(async () => {
+            let result
+            await fetch('./tasks.pbf')
+              .then(response => response.arrayBuffer())
+              .then(data => {
+                const buffer = new Uint8Array(data)
+                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+                while (reader.pos < reader.len) {
+                  result += Task.decodeDelimited(reader)
+                }
+              })
+            return result
+          }, 'decodeDelimited')
+          t.bench(100)
+          // t.test({text: 'test', done: true})
+        })();
 
       })
     </script>
