@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Task</title>
+    <title>Pbf test</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"/>
     <meta name="mobile-web-app-capable" content="yes">
@@ -14,65 +14,19 @@
     <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.6/dist/protobuf.min.js"></script>
     <script type="module">
       import Test from './test.js'
+      const r = 1000000;
 
       (() => {
         const t = new Test(async () => {
-          let result
-          await fetch('json', {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({text: 'test', done: true})})
-            .then(response => response.json())
-            .then(data => result = data)
-          return result
-        }, 'server json')
-        t.bench(1000)
-        t.test({text: 'test', done: true})
-      })();
-
-      (() => {
-        const t = new Test(async () => {
-          const msg = {text: 'test', done: true}
-          const bin = JSON.stringify(msg)
+          const bin = JSON.stringify({text: 'test', done: true})
           return JSON.parse(bin)
-        }, 'stringify parse')
-        t.bench(100000)
+        }, 'json')
+        t.bench(r)
         t.test({text: 'test', done: true})
-      })();
-
-      (() => {
-        const t = new Test(async () => {
-          let result
-          await fetch('./task.json')
-            .then(response => response.json())
-            .then(data => result = data)
-          return result
-        }, 'json response')
-        t.bench(1000)
-        t.test({text: 'test', done: false})
       })();
 
       protobuf.load('./task.proto').then((root) => {
         const Task = root.lookup('Task');
-
-        (() => {
-          const t = new Test(async () => {
-            let result
-            await fetch('pbf', {
-              method: 'PUT',
-              headers: {'Content-Type': 'application/octet-stream'},
-              body: new Uint8Array([0x0a, 0x04, 0x74, 0x65, 0x73, 0x74, 0x10, 0x01])})
-              .then(response => response.arrayBuffer())
-              .then(data => {
-                const buffer = new Uint8Array(data)
-                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-                result = Task.decode(reader)
-              })
-            return result
-          }, 'server pbf')
-          t.bench(1000)
-          t.test({text: 'test', done: true})
-        })();
 
         (() => {
           const t = new Test(async () => {
@@ -81,8 +35,8 @@
             const buffer = writer.finish()
             const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
             return Task.decode(reader)
-          }, 'encode decode')
-          t.bench(1000)
+          }, 'pbf')
+          t.bench(r)
           t.test({text: 'test', done: false})
         })();
 
@@ -93,43 +47,9 @@
             const buffer = writer.finish()
             const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
             return Task.decodeDelimited(reader)
-          }, 'encodeDelimited decodeDelimited')
-          t.bench(1000)
+          }, 'pbf delimited')
+          t.bench(r)
           t.test({text: 'test', done: false})
-        })();
-
-        (() => {
-          const t = new Test(async () => {
-            let result
-            await fetch('./task.pbf')
-              .then(response => response.arrayBuffer())
-              .then(data => {
-                const buffer = new Uint8Array(data)
-                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-                result = Task.decode(reader)
-              })
-            return result
-          }, 'decode')
-          t.bench(1)
-          t.test({text: 'test', done: true})
-        })();
-
-        (() => {
-          const t = new Test(async () => {
-            let result
-            await fetch('./tasks.pbf')
-              .then(response => response.arrayBuffer())
-              .then(data => {
-                const buffer = new Uint8Array(data)
-                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
-                while (reader.pos < reader.len) {
-                  result += Task.decodeDelimited(reader)
-                }
-              })
-            return result
-          }, 'decodeDelimited')
-          t.bench(100)
-          // t.test({text: 'test', done: true})
         })();
 
       })

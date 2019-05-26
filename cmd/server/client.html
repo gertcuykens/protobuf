@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Pbf test</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.6/dist/protobuf.min.js"></script>
+    <script type="module">
+      import Test from './test.js'
+      const r = 1000;
+
+      (() => {
+        const t = new Test(async () => {
+          let result
+          await fetch('./task.json')
+            .then(response => response.json())
+            .then(data => result = data)
+          return result
+        }, 'json')
+        t.bench(r)
+        t.test({text: 'test', done: false})
+      })();
+
+      protobuf.load('./task.proto').then((root) => {
+        const Task = root.lookup('Task');
+
+        (() => {
+          const t = new Test(async () => {
+            let result
+            await fetch('./task.pbf')
+              .then(response => response.arrayBuffer())
+              .then(data => {
+                const buffer = new Uint8Array(data)
+                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+                result = Task.decode(reader)
+              })
+            return result
+          }, 'pbf')
+          t.bench(r)
+          t.test({text: 'test', done: true})
+        })();
+
+        (() => {
+          const t = new Test(async () => {
+            let result = []
+            await fetch('./tasks.pbf')
+              .then(response => response.arrayBuffer())
+              .then(data => {
+                const buffer = new Uint8Array(data)
+                const reader = protobuf.Reader.create(buffer) // new protobuf.BufferReader(buffer)
+                while (reader.pos < reader.len) {
+                  result.push(Task.decodeDelimited(reader))
+                }
+              })
+            return result
+          }, 'pbf delimited')
+          t.bench(r)
+          t.test([{text: 'jjjjjj'},{text: 'ffffff'},{text: 'ffffff'}])
+        })();
+
+      })
+    </script>
+  </head>
+</html>
