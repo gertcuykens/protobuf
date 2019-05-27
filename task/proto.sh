@@ -25,13 +25,4 @@ hexdump -c task.pbf
 hexdump task.pbf
 
 # npm i protobufjs -g
-
-pbjs -p . task.proto -t static-module -w commonjs -o task.pb.js
-
-# pbjs -p . task.proto -t static-module --es6 -w es6 -o task.pb.js
-
-# npm i browserify -g
-
-# browserify task.pb.js -o task.pb2.js
-
-# protoc task.proto -I . --js_out=import_style=closure,library=task.pb,binary:.
+pbjs -p . task.proto -t static-module -w es6 -o task.pb.mjs

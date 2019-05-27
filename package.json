@@ -2,13 +2,12 @@
   "name": "protobuf",
   "version": "0.0.0",
   "description": "",
-  "main": "task/task_test.js",
-  "browser": "task.js",
+  "main": "task_test.mjs",
   "dependencies": {
     "protobufjs": "^6.8.8"
   },
   "scripts": {
-    "test": "main_test.js"
+    "test": "task_test.mjs"
   },
   "repository": {
     "type": "git",

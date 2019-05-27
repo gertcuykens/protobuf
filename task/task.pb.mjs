@@ -1,22 +1,20 @@
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
-"use strict";
-
-var $protobuf = require("protobufjs/minimal");
+import * as $protobuf from "protobufjs/minimal";
 
 // Common aliases
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
 // Exported root namespace
-var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
+const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.task = (function() {
+export const task = $root.task = (() => {
 
     /**
      * Namespace task.
      * @exports task
      * @namespace
      */
-    var task = {};
+    const task = {};
 
     task.Task = (function() {
 
@@ -38,7 +36,7 @@ $root.task = (function() {
          */
         function Task(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -117,9 +115,9 @@ $root.task = (function() {
         Task.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.task.Task();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.task.Task();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.text = reader.string();
@@ -182,7 +180,7 @@ $root.task = (function() {
         Task.fromObject = function fromObject(object) {
             if (object instanceof $root.task.Task)
                 return object;
-            var message = new $root.task.Task();
+            let message = new $root.task.Task();
             if (object.text != null)
                 message.text = String(object.text);
             if (object.done != null)
@@ -202,7 +200,7 @@ $root.task = (function() {
         Task.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (options.defaults) {
                 object.text = "";
                 object.done = false;
@@ -247,7 +245,7 @@ $root.task = (function() {
          */
         function Test(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -316,9 +314,9 @@ $root.task = (function() {
         Test.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.task.Test();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.task.Test();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.object = $root.google.protobuf.Any.decode(reader, reader.uint32());
@@ -359,7 +357,7 @@ $root.task = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.object != null && message.hasOwnProperty("object")) {
-                var error = $root.google.protobuf.Any.verify(message.object);
+                let error = $root.google.protobuf.Any.verify(message.object);
                 if (error)
                     return "object." + error;
             }
@@ -377,7 +375,7 @@ $root.task = (function() {
         Test.fromObject = function fromObject(object) {
             if (object instanceof $root.task.Test)
                 return object;
-            var message = new $root.task.Test();
+            let message = new $root.task.Test();
             if (object.object != null) {
                 if (typeof object.object !== "object")
                     throw TypeError(".task.Test.object: object expected");
@@ -398,7 +396,7 @@ $root.task = (function() {
         Test.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (options.defaults)
                 object.object = null;
             if (message.object != null && message.hasOwnProperty("object"))
@@ -423,14 +421,14 @@ $root.task = (function() {
     return task;
 })();
 
-$root.google = (function() {
+export const google = $root.google = (() => {
 
     /**
      * Namespace google.
      * @exports google
      * @namespace
      */
-    var google = {};
+    const google = {};
 
     google.protobuf = (function() {
 
@@ -439,7 +437,7 @@ $root.google = (function() {
          * @memberof google
          * @namespace
          */
-        var protobuf = {};
+        const protobuf = {};
 
         protobuf.Any = (function() {
 
@@ -461,7 +459,7 @@ $root.google = (function() {
              */
             function Any(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -540,9 +538,9 @@ $root.google = (function() {
             Any.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Any();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Any();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.type_url = reader.string();
@@ -605,7 +603,7 @@ $root.google = (function() {
             Any.fromObject = function fromObject(object) {
                 if (object instanceof $root.google.protobuf.Any)
                     return object;
-                var message = new $root.google.protobuf.Any();
+                let message = new $root.google.protobuf.Any();
                 if (object.type_url != null)
                     message.type_url = String(object.type_url);
                 if (object.value != null)
@@ -628,7 +626,7 @@ $root.google = (function() {
             Any.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.type_url = "";
                     if (options.bytes === String)
@@ -666,4 +664,4 @@ $root.google = (function() {
     return google;
 })();
 
-module.exports = $root;
+export { $root as default };
