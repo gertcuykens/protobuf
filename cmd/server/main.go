@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"../../task"
 	"github.com/gertcuykens/httx"
-	"github.com/gertcuykens/protobuf/task"
 	"github.com/golang/protobuf/proto"
 )
 

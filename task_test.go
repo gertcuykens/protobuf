@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	testing "testing"
 
-	"github.com/gertcuykens/protobuf/task"
+	"./task"
 	proto2 "github.com/gogo/protobuf/proto"
 	"github.com/golang/protobuf/proto"
 )
