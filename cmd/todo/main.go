@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gertcuykens/protobuf/task"
+	"../../task"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -80,8 +80,8 @@ func list() error {
 	return stream(bufio.NewReader(file))
 }
 
-func stream(buffer io.ByteReader) error {
-	l, err := binary.ReadUvarint(buffer)
+func stream(buffer io.Reader) error {
+	l, err := binary.ReadUvarint(buffer.(io.ByteReader))
 	if err == io.EOF {
 		return nil
 	}
@@ -94,12 +94,9 @@ func stream(buffer io.ByteReader) error {
 	}
 
 	b := make([]byte, l)
-
-	for i := range b {
-		b[i], err = buffer.ReadByte()
-		if err != nil {
-			return fmt.Errorf("%v", err)
-		}
+	_, err = buffer.Read(b)
+	if err != nil {
+		return fmt.Errorf("%s", err.Error())
 	}
 
 	if err := todo(b); err != nil {
