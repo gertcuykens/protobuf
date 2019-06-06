@@ -81,6 +81,8 @@ func list() error {
 }
 
 func stream(buffer io.Reader) error {
+	// var l uint64
+	// err := binary.Read(buffer, binary.BigEndian, &l)
 	l, err := binary.ReadUvarint(buffer.(io.ByteReader))
 	if err == io.EOF {
 		return nil
